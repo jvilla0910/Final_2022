@@ -259,3 +259,72 @@ The graphical results did show a difference in gays who contracted covid-19 when
 
 ## Druggies
 
+### Graphical Descriptive Results
+
+```{r}
+dd2 <- DrugUser %>% group_by(infected,treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+basicC <- ggplot(dd2,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position="dodge")
+#Now for percentage plot
+basicCC <- ggplot(dd2,aes(x=infected,y=prcnt*100,fill=treatment)) 
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
+
+The plots represent the population of drug users and their relationship to getting covid-19 by taking either the vaccine or placebo. There are two plots that came out. Both plots show two bars for treatment, the placebo or the vaccine. Along the x-axis is the count of people who came in contact with covid. Along the y-axis is those infected with covid. The first plot shows the number of people infected with covid. The second plot shows the percentage of people infected with covid.
+
+The bar plot depicts that roughly 85% of the drug user population who got covid-19, took the vaccine. Whereas, about 15% of the drug users who got covid-19, took the placebo. For drug users who did not get covid-19, we can see that the difference is about half for either taking the placebo or vaccine. A substantially higher percentage of drug users who took the vaccine, contracted covid-19, compared to drug users who took the placebo. This indicates that the vaccine is not effective at all for the drug user population.
+
+### Numerical Descriptive Results 
+
+```{r}
+table4 <- xtabs(~infected + treatment, data=DrugUser)
+rowPerc(table4)
+colPerc(table4)
+```
+
+The data table above show values of the drug user population. It shows both count and percentages. The table shows all the case scenarios, those infected with covid after vaccine, those not infected with covid after placebo, etc. 
+
+About 15% of drug users that took the placebo, got covid-19. While about 85% that took the vaccine got covid-19. The vaccine is clearly not effective here in preventing covid-19 among drug users. Those who took the vaccine were much more likely to get covid-19. The odds of getting covid-19 for this group, while taking the placebo, is about 0.6 to 3.3, or about 1:5.5. This means drug users are about 5.5 times more likely to contract covid when taking the vaccine, compared to the placebo.
+
+
+
+### Inferential Descriptive Results 
+
+```{r}
+table4 <- xtabs(~infected + treatment, data=DrugUser)
+chisq.test(table4)
+chisqtestGC(table4)
+Druguserfish <- fisher.test(table4)
+Druguserfish
+```
+
+
+After running the chi-squared test, we acquired a P-value of about 0.0000002. After running the fisher's exact test, we acquired a P-value of about 0.00000003. Since these are below 0.05, I reject the null hypothesis due to an extremely small p-value. The fisher exact test also states that the odds ratio is 0.18. The odds ratio of 0.18 means that there is a 82% decrease in odds. The results are statistically significant. I can observe that there is a difference in contracting covid for drug users who take the vaccine versus the placebo, it being harmful. 
+
+
+### Effictiveness and Confidence Intervals
+
+```{r}
+effect <- Druguserfish$p.value/(Druguserfish$p.value +1)
+effectivenessDruguser = Druguserfish$estimate/(Druguserfish$estimate +1)*100
+print(effectivenessDruguser)
+```
+
+```{r}
+low=(Druguserfish$conf.int[1]/(Druguserfish$conf.int[1] +1))*100
+hi=(Druguserfish$conf.int[2]/(Druguserfish$conf.int[2] +1))*100
+options(digits=2)
+```
+
+
+The odds ratio can approximate how effective the vaccine is. If the odds is above 50%, then the vaccine is effective. The 95% confidence interval will also be used to analyze effectiveness. The lower confidence value is about 0.077 and the higher confidence value is about 0.366. The odds ratio is about 0.18. Once converted to percentages, the lower confidence value is about 7.11% and the higher value is about 26.78%. The odds ratio is about 15%. Since this odds ratio is not higher than 50%, we can not conclude that the vaccine is effective for the drug user population.
+
+
+
+
+### Conclusion
+
+
+In this section, we investigated whether or not the preventative vaccine was effective for drug users. The null hypothesis was "There is no difference in contracting covid-19 when taking the preventative vaccine, covid91, compared to the pacebo for this particular subgroup (male, female, gay, or drug user)." The alternative hypothesis was "There is a difference in contracting covid-19 when taking the preventative vaccine, covid91, compared to the pacebo for this particular subgroup (male, female, gay, or drug user)."
+
+The graphical results did show a difference in drug users who contracted covid-19 when taking the vaccine, versus the placebo. The numerical summary also showed this, but gave exact numbers and percentages. Drug users were 5.5 times more likely to contract covid-19 when taking the vaccine, versus the placebo The inferential results showed p-values all under 0.05. I reject the null hypothesis due to low enough p-values. After establishing the odds ratio and 95% confidence interval, we ran test for effectiveness. Since the value was not above 50%, at 15%, I can conclude that the vaccine is not effective for drug users. I recommend that drug users do not take the vaccine to prevent contracting covid-19.
